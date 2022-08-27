@@ -10,6 +10,7 @@ import { TodoUpdate } from '../models/TodoUpdate';
 const XAWS = AWSXRay.captureAWS(AWS)
 
 const logger = createLogger('TodosAccess');
+const expiration = process.env.SIGNED_URL_EXPIRATION;
 
 // TODO: Implement the dataLayer logic
 
@@ -19,15 +20,19 @@ export class TodosAccess {
     private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
     private readonly s3: Types = new XAWS.S3({ signatureVersion: 'v4' }),
     private readonly todoTable = process.env.TODOS_TABLE,
+    private readonly indexName = process.env.TODOS_CREATED_AT_INDEX,
     private readonly BUCKET_NAME = process.env.ATTACHMENT_S3_BUCKET
   ) {}
 
   // Method to get all Todo Items
   async getTodos(userId: string): Promise<TodoItem[]> {
-    logger.info('Getting all todo')
+    logger.info('Getting all todos')
+
+
 
     const queryParams = {
       TableName: this.todoTable,
+      IndexName: this.indexName,
       KeyConditionExpression: 'userId = :userId',
       ExpressionAttributeValues: {
         ':userId': userId
@@ -73,11 +78,11 @@ export class TodosAccess {
         userId: userId,
         todoId: todoId
       },
-      UpdateExpression: 'set #a = :a, #b = :b, #c = :c',
+      UpdateExpression: 'set #x = :a, #y = :b, #z= :c',
       ExpressionAttributeNames: {
-        '#a': 'name',
-        '#b': 'dueDate',
-        '#c': 'done'
+        '#x': 'name',
+        '#y': 'dueDate',
+        '#z': 'done'
       },
       ExpressionAttributeValues: {
         ':a': todoUpdate['name'],
@@ -120,8 +125,8 @@ export class TodosAccess {
     const url = await this.s3.getSignedUrl('putObject', {
       Bucket: this.BUCKET_NAME,
       Key: todoId,
-      Expires: 300
-    });
+      Expires: expiration
+    })
 
     logger.info(JSON.stringify(url));
 
