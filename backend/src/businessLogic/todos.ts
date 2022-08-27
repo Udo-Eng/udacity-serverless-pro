@@ -11,6 +11,7 @@ import * as uuid from 'uuid'
 
 
 const logger  = createLogger('Todos Logic');
+const bucketName = process.env.ATTACHMENT_S3_BUCKET;
 
 const todosAcess = new TodosAccess();
 
@@ -51,8 +52,8 @@ const todosAcess = new TodosAccess();
                   createdAt,
                   userId,
                   done: false,
-                  ...newTodo
-                  //   attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${imageId}`
+                  ...newTodo,
+                    attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${todoId}`
                 }
 
                 await todosAcess.createTodo(TodoItem)
