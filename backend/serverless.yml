@@ -1,6 +1,6 @@
 # TODO: Change the name of the org 
-org: udo-eng
-app: serverless-todo-app
+org: udoeng
+app: udo-todo-app
 service: serverless-todo-app
 
 plugins:
@@ -88,7 +88,6 @@ functions:
           cors: true
           authorizer: Auth
           reqValidatorName: RequestBodyValidator
-    iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: "Allow"        
         Action:
@@ -118,11 +117,10 @@ functions:
             requestModels:
               "application/json": CreateTodoRequest
           reqValidatorName: RequestBodyValidator
-          request:
-            schemas:
-              application/json: ${file(models/create-todo-model.json)}
-     iamRoleStatementsInherit: true
-     iamRoleStatements:
+          # request:
+          #   schemas:
+          #     application/json: ${file(models/create-todo-model.json)}
+    iamRoleStatements:
           - Effect: "Allow"        
             Action:       
               - dynamodb:PutItem        
@@ -232,7 +230,7 @@ resources:
     # TODO: Create a DynamoDB table with local secondary index and a composite key
     TodosTable:
       Type: AWS::DynamoDB::Table
-       Properties:
+      Properties:
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
@@ -273,7 +271,7 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
-         CorsConfiguration:
+        CorsConfiguration:
           CorsRules:
             -
               AllowedOrigins:

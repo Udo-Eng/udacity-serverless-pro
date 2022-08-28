@@ -1,13 +1,14 @@
 import * as AWS from 'aws-sdk';
 import { Types } from 'aws-sdk/clients/s3'
 import * as AWSXRay from 'aws-xray-sdk';
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { DocumentClient} from 'aws-sdk/clients/dynamodb';
 import { createLogger } from '../utils/logger';
 import { TodoItem } from '../models/TodoItem';
 import { TodoUpdate } from '../models/TodoUpdate';
 
 
 const XAWS = AWSXRay.captureAWS(AWS)
+
 
 const logger = createLogger('TodosAccess');
 const expiration = process.env.SIGNED_URL_EXPIRATION;
@@ -17,7 +18,7 @@ const expiration = process.env.SIGNED_URL_EXPIRATION;
 
 export class TodosAccess {
   constructor(
-    private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
+    private readonly docClient : DocumentClient = new DocumentClient(),
     private readonly s3: Types = new XAWS.S3({ signatureVersion: 'v4' }),
     private readonly todoTable = process.env.TODOS_TABLE,
     private readonly indexName = process.env.TODOS_CREATED_AT_INDEX,
